@@ -25,9 +25,14 @@ const client = new MongoClient(uri, {
 });
 
 async function verifyToken(req, res, mext) {
-  if (req.headers.authorization.startsWith("Bearer ")) {
+  if (req.headers?.authorization?.startsWith("Bearer ")) {
     const idToken = req.headers.authorization.split("Bearer ")[1];
-    console.log('inside separte function', idToken);
+    try {
+      const decodedUser = await admin.auth().verifyIdToken(idToken);
+      req.decodedUserEmail = decodedUser.email;
+    } catch {
+
+    }
   }
   next();
 }
@@ -70,14 +75,17 @@ async function run() {
 
     //get Orders
     app.get("/orders", verifyToken, async (req, res) => {
-      let query = {};
       const email = req.query.email;
-      if (email) {
-        query = { email: email };
+
+      if(req.decodedUserEmail === email) {
+        const query = { email: email };
+        const cursor = orderCollection.find(query);
+        const orders = await cursor.toArray();
+        res.json(orders);
+      } else {
+        res.status(401).json({message: 'User not authorized'})
       }
-      const cursor = orderCollection.find(query);
-      const orders = await cursor.toArray();
-      res.json(orders);
+
     });
 
     //add orders api
@@ -98,5 +106,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log("server running at port", port);
+  console.log("server running perfectly at port ", port);
 });
