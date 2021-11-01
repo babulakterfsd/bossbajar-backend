@@ -24,14 +24,17 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
 });
 
-async function verifyToken(req, res, mext) {
-  if (req.headers?.authorization?.startsWith("Bearer ")) {
+async function verifyToken(req, res, next) {
+  let nestedProp = await (req.headers && req.headers.authorization);
+  const nestedPropLength = nestedProp.length;
+
+  if (nestedProp.startsWith("Bearer ")) {
     const idToken = req.headers.authorization.split("Bearer ")[1];
     try {
       const decodedUser = await admin.auth().verifyIdToken(idToken);
       req.decodedUserEmail = decodedUser.email;
     } catch {
-
+         
     }
   }
   next();
