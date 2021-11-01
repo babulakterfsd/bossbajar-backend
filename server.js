@@ -25,14 +25,14 @@ const client = new MongoClient(uri, {
 });
 
 async function verifyToken(req, res, next) {
-  let nestedProp = await (req.headers && req.headers.authorization);
-  const nestedPropLength = nestedProp.length;
+  let replaceOptionalChaining = await (req.headers && req.headers.authorization);
 
-  if (nestedProp.startsWith("Bearer ")) {
+  if (replaceOptionalChaining) {
     const idToken = req.headers.authorization.split("Bearer ")[1];
     try {
       const decodedUser = await admin.auth().verifyIdToken(idToken);
       req.decodedUserEmail = decodedUser.email;
+      console.log('working', req.decodedUserEmail);
     } catch {
          
     }
