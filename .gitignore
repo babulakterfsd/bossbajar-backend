@@ -40,7 +40,6 @@ build/Release
 # Dependency directories and firebase admin
 node_modules/
 jspm_packages/
-bossbajar-a742b-firebase-adminsdk-w6ort-b9b501c0b7.json
 
 # TypeScript v1 declaration files
 typings/
